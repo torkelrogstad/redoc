@@ -29,6 +29,15 @@ export const InfoSpan = styled.span`
   &::before {
     content: '|';
     display: inline-block;
+
+    opacity: 0.5;
+    width: ${delimiterWidth}px;
+    text-align: center;
+  }
+
+  &::after {
+    content: '|';
+    display: inline-block;
     opacity: 0.5;
     width: ${delimiterWidth}px;
     text-align: center;

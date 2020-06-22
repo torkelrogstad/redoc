@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ShelfIcon } from '../../common-elements';
-import { OperationModel } from '../../services';
+import { ClipboardService, OperationModel } from '../../services';
 import { Markdown } from '../Markdown/Markdown';
 import { OptionsContext } from '../OptionsProvider';
 import { SelectOnClick } from '../SelectOnClick/SelectOnClick';
@@ -22,6 +22,9 @@ export interface EndpointProps {
   hideHostname?: boolean;
   inverted?: boolean;
   compact?: boolean;
+
+  handleUrl?: (index: number) => void;
+  serverIndex?: number;
 }
 
 export interface EndpointState {
@@ -38,6 +41,14 @@ export class Endpoint extends React.Component<EndpointProps, EndpointState> {
 
   toggle = () => {
     this.setState({ expanded: !this.state.expanded });
+  };
+
+  handleUrl = (url: number) => {
+    this.props.handleUrl?.(url);
+    this.setState({
+      expanded: false,
+    });
+    ClipboardService.copyCustom(this.props.operation.servers[url].url + this.props.operation.path);
   };
 
   render() {
@@ -63,14 +74,21 @@ export class Endpoint extends React.Component<EndpointProps, EndpointState> {
               />
             </EndpointInfo>
             <ServersOverlay expanded={expanded} aria-hidden={!expanded}>
-              {operation.servers.map(server => {
+              {operation.servers.map((server, index) => {
                 const normalizedUrl = options.expandDefaultServerVariables
                   ? expandDefaultServerVariables(server.url, server.variables)
                   : server.url;
                 return (
-                  <ServerItem key={normalizedUrl}>
-                    <Markdown source={server.description || ''} compact={true} />
-                    <SelectOnClick>
+                  <ServerItem
+                    className={this.props.serverIndex === index ? 'selected' : ''}
+                    key={normalizedUrl}
+                  >
+                    <Markdown
+                      onSelectUrl={() => this.handleUrl(index)}
+                      source={server.description || ''}
+                      compact={true}
+                    />
+                    <SelectOnClick onSelectUrl={() => this.handleUrl(index)}>
                       <ServerUrl>
                         <span>
                           {hideHostname || options.hideHostname

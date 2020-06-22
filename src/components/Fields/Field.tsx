@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react';
 import * as React from 'react';
+import styled from 'styled-components';
 
 import { ClickablePropertyNameCell, RequiredLabel } from '../../common-elements/fields';
 import { FieldDetails } from './FieldDetails';
@@ -12,10 +13,11 @@ import {
   PropertyNameCell,
 } from '../../common-elements/fields-layout';
 
-import { ShelfIcon } from '../../common-elements/';
+import { ShelfIcon, StyledDropdown } from '../../common-elements/';
 
 import { FieldModel } from '../../services/models';
 import { Schema, SchemaOptions } from '../Schema/Schema';
+import { interactiveStore } from '../../services/InteractiveStore';
 
 export interface FieldProps extends SchemaOptions {
   className?: string;
@@ -45,6 +47,11 @@ export class Field extends React.Component<FieldProps> {
     }
   };
 
+  onFieldChange = (argument: string) => (evt: React.ChangeEvent<HTMLInputElement>) => {
+    interactiveStore.addParameter(argument, evt.target.value);
+    this.props.field.setValue(evt.target.value);
+  };
+
   render() {
     const { className, field, isLast, expandByDefault } = this.props;
     const { name, deprecated, required, kind } = field;
@@ -65,7 +72,9 @@ export class Field extends React.Component<FieldProps> {
           aria-label="expand properties"
         >
           {name}
-          <ShelfIcon direction={expanded ? 'down' : 'right'} />
+          <i>
+            <ShelfIcon direction={expanded ? 'down' : 'right'} />
+          </i>
         </button>
         {required && <RequiredLabel> required </RequiredLabel>}
       </ClickablePropertyNameCell>
@@ -77,6 +86,46 @@ export class Field extends React.Component<FieldProps> {
       </PropertyNameCell>
     );
 
+    const getInteractiveField = (
+      field: FieldModel,
+      isTryingOut: boolean,
+    ): JSX.Element | undefined => {
+      if (!isTryingOut) {
+        return undefined;
+      }
+      if (field.in === 'query') {
+        if (field.schema.enum.length !== 0) {
+          return (
+            <td>
+              <StyledDropdown
+                onChange={({ value }) => {
+                  console.warn('value', value);
+                  const newValue = value === 'empty' ? '' : value;
+                  this.props.field.setValue(newValue);
+                }}
+                options={[{ value: 'empty' }, ...field.schema.enum.map(value => ({ value }))]}
+                value={this.props.field.$value}
+              />
+            </td>
+          );
+        }
+        return (
+          <td>
+            <TextField placeholder={field.name} onChange={this.onFieldChange(field.name)} />
+          </td>
+        );
+      }
+      if (field.in === 'path') {
+        return (
+          <td>
+            <TextField placeholder={field.name} onChange={this.onFieldChange(field.name)} />
+          </td>
+        );
+      }
+
+      return undefined;
+    };
+
     return (
       <>
         <tr className={isLast ? 'last ' + className : className}>
@@ -84,6 +133,21 @@ export class Field extends React.Component<FieldProps> {
           <PropertyDetailsCell>
             <FieldDetails {...this.props} />
           </PropertyDetailsCell>
+          {getInteractiveField(field, interactiveStore.active.get())}
+          {field.expanded && withSubSchema && (
+            <tr key={field.name + 'inner'}>
+              <PropertyCellWithInner colSpan={2}>
+                <InnerPropertiesWrap>
+                  <Schema
+                    schema={field.schema}
+                    skipReadOnly={this.props.skipReadOnly}
+                    skipWriteOnly={this.props.skipWriteOnly}
+                    showTitle={this.props.showTitle}
+                  />
+                </InnerPropertiesWrap>
+              </PropertyCellWithInner>
+            </tr>
+          )}
         </tr>
         {expanded && withSubSchema && (
           <tr key={field.name + 'inner'}>
@@ -103,3 +167,10 @@ export class Field extends React.Component<FieldProps> {
     );
   }
 }
+
+const TextField = styled.input`
+  padding: 0.5em;
+  margin: 0.5em;
+  border: 1px solid rgba(38, 50, 56, 0.5);
+  border-radius: 3px;
+`;

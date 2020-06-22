@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import { Badge, DarkRightPanel, H2, MiddlePanel, Row } from '../../common-elements';
 import { ShareLink } from '../../common-elements/linkify';
-import { OperationModel } from '../../services/models';
+import { OperationModel as OperationType, SecuritySchemesModel } from '../../services/models';
 import styled from '../../styled-components';
 import { CallbacksList } from '../Callbacks';
 import { CallbackSamples } from '../CallbackSamples/CallbackSamples';
@@ -17,6 +17,9 @@ import { RequestSamples } from '../RequestSamples/RequestSamples';
 import { ResponsesList } from '../Responses/ResponsesList';
 import { ResponseSamples } from '../ResponseSamples/ResponseSamples';
 import { SecurityRequirements } from '../SecurityRequirement/SecurityRequirement';
+import { ConsoleViewer } from '../Console/ConsoleViewer';
+import { interactiveStore } from '../../services/InteractiveStore';
+import { SwitchBox } from '../../common-elements/SwitchBox';
 
 const OperationRow = styled(Row)`
   backface-visibility: hidden;
@@ -29,16 +32,21 @@ const Description = styled.div`
 `;
 
 export interface OperationProps {
-  operation: OperationModel;
+  operation: OperationType;
+  securitySchemes: SecuritySchemesModel;
 }
 
 @observer
 export class Operation extends React.Component<OperationProps> {
+  state = {
+    urlIndex: 0,
+  };
   render() {
-    const { operation } = this.props;
+    const { operation, securitySchemes } = this.props;
 
     const { name: summary, description, deprecated, externalDocs } = operation;
     const hasDescription = !!(description || externalDocs);
+    const active = interactiveStore.active.get();
 
     return (
       <OptionsContext.Consumer>
@@ -49,6 +57,13 @@ export class Operation extends React.Component<OperationProps> {
                 <ShareLink to={operation.id} />
                 {summary} {deprecated && <Badge type="warning"> Deprecated </Badge>}
               </H2>
+              {options.enableConsole && (
+                <SwitchBox
+                  onClick={interactiveStore.toggleActive}
+                  checked={interactiveStore.active.get()}
+                  label="Try it out!"
+                />
+              )}
               {options.pathInMiddlePanel && <Endpoint operation={operation} inverted={true} />}
               {hasDescription && (
                 <Description>
@@ -63,10 +78,27 @@ export class Operation extends React.Component<OperationProps> {
               <CallbacksList callbacks={operation.callbacks} />
             </MiddlePanel>
             <DarkRightPanel>
-              {!options.pathInMiddlePanel && <Endpoint operation={operation} />}
-              <RequestSamples operation={operation} />
-              <ResponseSamples operation={operation} />
-              <CallbackSamples callbacks={operation.callbacks} />
+              {/* TODO: change URL dynamically with entered information if in editing mode */}
+              {!options.pathInMiddlePanel && (
+                <Endpoint
+                  serverIndex={this.state.urlIndex}
+                  operation={operation}
+                  handleUrl={index => this.setState({ urlIndex: index })}
+                />
+              )}
+              {active && (
+                <div>
+                  <ConsoleViewer
+                    urlIndex={this.state.urlIndex}
+                    securitySchemes={securitySchemes}
+                    operation={operation}
+                    additionalHeaders={options.additionalHeaders}
+                  />
+                </div>
+              )}
+              {!active && <RequestSamples operation={operation} />}
+              {!active && <ResponseSamples operation={operation} />}
+              {!active && <CallbackSamples callbacks={operation.callbacks} />}
             </DarkRightPanel>
           </OperationRow>
         )}

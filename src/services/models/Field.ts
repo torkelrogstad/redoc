@@ -38,9 +38,8 @@ const DEFAULT_SERIALIZATION: Record<
  * Field or Parameter model ready to be used by components
  */
 export class FieldModel {
-  @observable
-  expanded: boolean | undefined;
-
+  @observable expanded: boolean = false;
+  @observable $value: string = '';
   schema: SchemaModel;
   name: string;
   required: boolean;
@@ -104,5 +103,10 @@ export class FieldModel {
   @action
   toggle() {
     this.expanded = !this.expanded;
+  }
+
+  @action
+  setValue(value: string) {
+    this.$value = value;
   }
 }

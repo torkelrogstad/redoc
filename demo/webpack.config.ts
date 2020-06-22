@@ -17,6 +17,7 @@ function root(filename) {
 const tsLoader = (env) => ({
   loader: 'ts-loader',
   options: {
+    transpileOnly: true,
     compilerOptions: {
       module: env.bench ? 'esnext' : 'es2015',
       declaration: false,

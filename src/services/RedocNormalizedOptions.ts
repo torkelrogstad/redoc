@@ -9,6 +9,8 @@ export interface RedocRawOptions {
   theme?: ThemeInterface;
   scrollYOffset?: number | string | (() => number);
   hideHostname?: boolean | string;
+  enableConsole?: boolean;
+  additionalHeaders?: object;
   expandResponses?: string | 'all';
   requiredPropsFirst?: boolean | string;
   sortPropsAlphabetically?: boolean | string;
@@ -184,6 +186,8 @@ export class RedocNormalizedOptions {
   simpleOneOfTypeLabel: boolean;
   payloadSampleIdx: number;
   expandSingleSchemaField: boolean;
+  enableConsole: boolean;
+  additionalHeaders: object;
 
   /* tslint:disable-next-line */
   unstable_ignoreMimeParameters: boolean;
@@ -240,6 +244,8 @@ export class RedocNormalizedOptions {
     this.simpleOneOfTypeLabel = argValueToBoolean(raw.simpleOneOfTypeLabel);
     this.payloadSampleIdx = RedocNormalizedOptions.normalizePayloadSampleIdx(raw.payloadSampleIdx);
     this.expandSingleSchemaField = argValueToBoolean(raw.expandSingleSchemaField);
+    this.enableConsole = argValueToBoolean(raw.enableConsole);
+    this.additionalHeaders = raw.additionalHeaders || {};
 
     this.unstable_ignoreMimeParameters = argValueToBoolean(raw.unstable_ignoreMimeParameters);
 

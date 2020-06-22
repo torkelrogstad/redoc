@@ -157,6 +157,10 @@ const defaultTheme: ThemeInterface = {
   },
   codeBlock: {
     backgroundColor: ({ rightPanel }) => darken(0.1, rightPanel.backgroundColor),
+    textColor: ({ rightPanel }) => rightPanel.textColor,
+  },
+  styledPre: {
+    maxHeight: '500px',
   },
 };
 
@@ -332,9 +336,13 @@ export interface ResolvedThemeInterface {
   };
   codeBlock: {
     backgroundColor: string;
+    textColor: string;
   };
 
   extensionsHook?: (name: string, props: any) => string;
+  styledPre: {
+    maxHeight: string;
+  };
 }
 
 export type primitive = string | number | boolean | undefined | null;
