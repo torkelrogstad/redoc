@@ -5,17 +5,15 @@
 
   [![Build Status](https://travis-ci.org/Redocly/redoc.svg?branch=master)](https://travis-ci.org/Redocly/redoc) [![Coverage Status](https://coveralls.io/repos/Redocly/redoc/badge.svg?branch=master&service=github)](https://coveralls.io/github/Redocly/redoc?branch=master) [![dependencies Status](https://david-dm.org/Redocly/redoc/status.svg)](https://david-dm.org/Redocly/redoc) [![devDependencies Status](https://david-dm.org/Redocly/redoc/dev-status.svg)](https://david-dm.org/Redocly/redoc#info=devDependencies) [![npm](http://img.shields.io/npm/v/redoc.svg)](https://www.npmjs.com/package/redoc) [![License](https://img.shields.io/npm/l/redoc.svg)](https://github.com/Redocly/redoc/blob/master/LICENSE)
 
-  [![bundle size](http://img.badgesize.io/https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js?compression=gzip&max=300000)](https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js) [![npm](https://img.shields.io/npm/dm/redoc.svg)](https://www.npmjs.com/package/redoc) [![](https://data.jsdelivr.com/v1/package/npm/redoc/badge)](https://www.jsdelivr.com/package/npm/redoc) [![Docker Build Status](https://img.shields.io/docker/build/redocly/redoc.svg)](https://hub.docker.com/r/redocly/redoc/)
+  [![bundle size](http://img.badgesize.io/https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js?compression=gzip&max=300000)](https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js) [![npm](https://img.shields.io/npm/dm/redoc.svg)](https://www.npmjs.com/package/redoc) [![](https://data.jsdelivr.com/v1/package/npm/redoc/badge)](https://www.jsdelivr.com/package/npm/redoc) [![Docker Build Status](https://img.shields.io/docker/build/torkelrogstad/redoc.svg)](https://hub.docker.com/r/rogstad/redoc/)
 
 
 </div>
 
-**This is README for `2.0` version of ReDoc (React based). README for `1.x` version is on the branch [v1.x](https://github.com/Redocly/redoc/tree/v1.x)**
+**This is a fork of [`redocly/redoc`](https://github.com/redocly/redoc) with added support for interactively trying out APIs. It is based on an initial implementation by [`raha1923`](https://github.com/raha1923/redoc).**
 
 
 ![ReDoc demo](https://raw.githubusercontent.com/Redocly/redoc/master/demo/redoc-demo.png)
-
-## [Live demo](http://redocly.github.io/redoc/)
 
 [<img alt="Deploy to Github" src="http://i.imgur.com/YZmaqk3.png" height="60px">](https://github.com/Rebilly/generator-openapi-repo#generator-openapi-repo--) [<img alt="ReDoc as a service" src="http://i.imgur.com/edqdCv6.png" height="60px">](https://redoc.ly) [<img alt="Customization services" src="http://i.imgur.com/c4sUF7M.png" height="60px">](https://redoc.ly/#services)
 
@@ -42,8 +40,8 @@
   - [x] ~~better navigation (menu improvements + search)~~
   - [x] ~~React rewrite~~
   - [x] ~~docs pre-rendering (performance and SEO)~~
+  - [x] ~~built-in API Console~~
   - [ ] ability to simple branding/styling
-  - [ ] built-in API Console
 
 ## Releases
 **Important:** all the 2.x releases are deployed to npm and can be used via jsdeliver:
@@ -189,14 +187,14 @@ You can also specify `onLoaded` callback which will be called each time Redoc ha
 
 ## The Docker way
 
-ReDoc is available as pre-built Docker image in official [Docker Hub repository](https://hub.docker.com/r/redocly/redoc/). You may simply pull & run it:
+ReDoc is available as pre-built Docker image in [Docker Hub repository](https://hub.docker.com/r/rogstad/redoc/) for this fork. You may simply pull & run it:
 
-    docker pull redocly/redoc
-    docker run -p 8080:80 redocly/redoc
+    docker pull rogstad/redoc
+    docker run -p 8080:80 rogstad/redoc
 
 Also you may rewrite some predefined environment variables defined in [Dockerfile](./config/docker/Dockerfile). By default ReDoc starts with demo Petstore spec located at `http://petstore.swagger.io/v2/swagger.json`, but you may change this URL using environment variable `SPEC_URL`:
 
-    docker run -p 8080:80 -e SPEC_URL=https://api.example.com/openapi.json redocly/redoc
+    docker run -p 8080:80 -e SPEC_URL=https://api.example.com/openapi.json rogstad/redoc
 
 ## ReDoc CLI
 
