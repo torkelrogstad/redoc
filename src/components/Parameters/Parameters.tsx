@@ -10,6 +10,8 @@ import { MediaTypesSwitch } from '../MediaTypeSwitch/MediaTypesSwitch';
 import { Schema } from '../Schema';
 
 import { Markdown } from '../Markdown/Markdown';
+import { interactiveStore } from '../../services/InteractiveStore';
+import { observer } from 'mobx-react';
 
 function safePush(obj, prop, item) {
   if (!obj[prop]) {
@@ -21,10 +23,12 @@ function safePush(obj, prop, item) {
 export interface ParametersProps {
   parameters?: FieldModel[];
   body?: RequestBodyModel;
+  operationId?: string;
 }
 
 const PARAM_PLACES = ['path', 'query', 'cookie', 'header'];
 
+@observer
 export class Parameters extends React.PureComponent<ParametersProps> {
   orderParams(params: FieldModel[]): Record<string, FieldModel[]> {
     const res = {};
@@ -48,10 +52,18 @@ export class Parameters extends React.PureComponent<ParametersProps> {
 
     const bodyDescription = body && body.description;
 
+    const interactive =
+      this.props.operationId !== undefined &&
+      this.props.operationId === interactiveStore.active?.operationId;
     return (
       <>
         {paramsPlaces.map(place => (
-          <ParametersGroup key={place} place={place} parameters={paramsMap[place]} />
+          <ParametersGroup
+            interactive={interactive}
+            key={place}
+            place={place}
+            parameters={paramsMap[place]}
+          />
         ))}
         {bodyContent && <BodyContent content={bodyContent} description={bodyDescription} />}
       </>

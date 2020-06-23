@@ -15,6 +15,8 @@ import {
   ServersOverlay,
   ServerUrl,
 } from './styled.elements';
+import { addParamsToUrl } from '../../utils/uri';
+import { observer } from 'mobx-react';
 
 export interface EndpointProps {
   operation: OperationModel;
@@ -31,6 +33,7 @@ export interface EndpointState {
   expanded: boolean;
 }
 
+@observer
 export class Endpoint extends React.Component<EndpointProps, EndpointState> {
   constructor(props) {
     super(props);
@@ -55,6 +58,7 @@ export class Endpoint extends React.Component<EndpointProps, EndpointState> {
     const { operation, inverted, hideHostname } = this.props;
     const { expanded } = this.state;
 
+    const withParams = addParamsToUrl(operation, this.props.serverIndex ?? 0);
     // TODO: highlight server variables, e.g. https://{user}.test.com
     return (
       <OptionsContext.Consumer>
@@ -64,7 +68,9 @@ export class Endpoint extends React.Component<EndpointProps, EndpointState> {
               <HttpVerb type={operation.httpVerb} compact={this.props.compact}>
                 {operation.httpVerb}
               </HttpVerb>
-              <ServerRelativeURL>{operation.path}</ServerRelativeURL>
+              <ServerRelativeURL>
+                {decodeURIComponent(withParams.pathname) + decodeURIComponent(withParams.search)}
+              </ServerRelativeURL>
               <ShelfIcon
                 float={'right'}
                 color={inverted ? 'black' : 'white'}

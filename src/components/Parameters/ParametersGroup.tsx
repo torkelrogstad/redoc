@@ -11,6 +11,7 @@ import { mapWithLast } from '../../utils';
 export interface ParametersGroupProps {
   place: string;
   parameters: FieldModel[];
+  interactive?: boolean;
 }
 
 export class ParametersGroup extends React.PureComponent<ParametersGroupProps, any> {
@@ -26,7 +27,13 @@ export class ParametersGroup extends React.PureComponent<ParametersGroupProps, a
         <PropertiesTable>
           <tbody>
             {mapWithLast(parameters, (field, isLast) => (
-              <Field key={field.name} isLast={isLast} field={field} showExamples={true} />
+              <Field
+                interactive={this.props.interactive}
+                key={field.name}
+                isLast={isLast}
+                field={field}
+                showExamples={true}
+              />
             ))}
           </tbody>
         </PropertiesTable>

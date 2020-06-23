@@ -26,6 +26,7 @@ export interface FieldProps extends SchemaOptions {
 
   field: FieldModel;
   expandByDefault?: boolean;
+  interactive?: boolean;
 
   renderDiscriminatorSwitch?: (opts: FieldProps) => JSX.Element;
 }
@@ -51,6 +52,13 @@ export class Field extends React.Component<FieldProps> {
     interactiveStore.addParameter(argument, evt.target.value);
     this.props.field.setValue(evt.target.value);
   };
+
+  /** Clear text field when interactive mode is switched off */
+  componentDidUpdate(prevProps: FieldProps) {
+    if (prevProps.interactive && !this.props.interactive) {
+      this.props.field.setValue('');
+    }
+  }
 
   render() {
     const { className, field, isLast, expandByDefault } = this.props;
@@ -86,41 +94,28 @@ export class Field extends React.Component<FieldProps> {
       </PropertyNameCell>
     );
 
-    const getInteractiveField = (
-      field: FieldModel,
-      isTryingOut: boolean,
-    ): JSX.Element | undefined => {
-      if (!isTryingOut) {
+    const getInteractiveField = (field: FieldModel): JSX.Element | undefined => {
+      if (!this.props.interactive) {
         return undefined;
       }
       if (field.in === 'query') {
         if (field.schema.enum.length !== 0) {
           return (
-            <td>
-              <StyledDropdown
-                onChange={({ value }) => {
-                  console.warn('value', value);
-                  const newValue = value === 'empty' ? '' : value;
-                  this.props.field.setValue(newValue);
-                }}
-                options={[{ value: 'empty' }, ...field.schema.enum.map(value => ({ value }))]}
-                value={this.props.field.$value}
-              />
-            </td>
+            <StyledDropdown
+              onChange={({ value }) => {
+                console.warn('value', value);
+                const newValue = value === 'empty' ? '' : value;
+                this.props.field.setValue(newValue);
+              }}
+              options={[{ value: 'empty' }, ...field.schema.enum.map(value => ({ value }))]}
+              value={this.props.field.$value}
+            />
           );
         }
-        return (
-          <td>
-            <TextField placeholder={field.name} onChange={this.onFieldChange(field.name)} />
-          </td>
-        );
+        return <TextField placeholder={field.name} onChange={this.onFieldChange(field.name)} />;
       }
       if (field.in === 'path') {
-        return (
-          <td>
-            <TextField placeholder={field.name} onChange={this.onFieldChange(field.name)} />
-          </td>
-        );
+        return <TextField placeholder={field.name} onChange={this.onFieldChange(field.name)} />;
       }
 
       return undefined;
@@ -132,8 +127,8 @@ export class Field extends React.Component<FieldProps> {
           {paramName}
           <PropertyDetailsCell>
             <FieldDetails {...this.props} />
+            {getInteractiveField(field)}
           </PropertyDetailsCell>
-          {getInteractiveField(field, interactiveStore.active.get())}
           {field.expanded && withSubSchema && (
             <tr key={field.name + 'inner'}>
               <PropertyCellWithInner colSpan={2}>

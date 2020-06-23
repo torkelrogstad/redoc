@@ -4,7 +4,7 @@ import Switch from 'react-switch';
 import styled from '../styled-components';
 
 const FlexLayout = styled.div`
-  align-items: flex-end;
+  align-items: center;
   display: flex;
   width: 100%;
   flex-direction: row-reverse;
@@ -17,7 +17,7 @@ interface LabelProps {
 const Label = styled.label<LabelProps>`
   color: ${props =>
     props.active ? props.theme.colors.success.main : props.theme.colors.text.secondary};
-  margin-left: 10px;
+  margin-right: 10px;
   font-size: 120%;
 `;
 

@@ -1,6 +1,10 @@
 import { observer } from 'mobx-react';
 import * as React from 'react';
 import AceEditor from 'react-ace';
+// eslint-disable-next-line import/no-internal-modules
+import 'ace-builds/src-noconflict/mode-json';
+// eslint-disable-next-line import/no-internal-modules
+import 'ace-builds/src-noconflict/ext-language_tools';
 
 import { MediaTypeModel } from '../../services/models';
 import { ConsoleEditorWrapper } from './ConsoleEditorWrapper';
@@ -10,6 +14,7 @@ export interface ConsoleEditorProps {
 }
 
 export const ConsoleEditor = observer(
+  // eslint-disable-next-line react/display-name
   React.forwardRef<AceEditor, ConsoleEditorProps>(({ mediaTypes }, ref) => {
     if (!mediaTypes.length) {
       return null;

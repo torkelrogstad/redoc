@@ -45,7 +45,6 @@ export const EndpointInfo = styled.button<{ expanded?: boolean; inverted?: boole
   background-color: ${props =>
     props.inverted ? 'transparent' : props.theme.codeBlock.backgroundColor};
   display: flex;
-  white-space: nowrap;
   align-items: center;
   border: ${props => (props.inverted ? '0' : '1px solid transparent')};
   border-bottom: ${props => (props.inverted ? '1px solid #ccc' : '0')};

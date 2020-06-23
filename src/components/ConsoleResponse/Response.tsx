@@ -6,14 +6,12 @@ import styled from '../../styled-components';
 import { JsonViewer } from '../JsonViewer/JsonViewer';
 
 interface ConsoleResponseProps {
-  response: Response;
+  response?: Response;
   content: any;
 }
 
-export const ConsoleResponse: React.FC<ConsoleResponseProps> = ({
-  response: { type, status, statusText, headers },
-  content,
-}) => {
+export const ConsoleResponse: React.FC<ConsoleResponseProps> = ({ response, content }) => {
+  const { type = 'error', status = 500, statusText, headers } = response ?? {};
   const [collapse, setCollapse] = React.useState(false);
 
   return (

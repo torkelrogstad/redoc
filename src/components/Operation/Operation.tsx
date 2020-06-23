@@ -46,7 +46,7 @@ export class Operation extends React.Component<OperationProps> {
 
     const { name: summary, description, deprecated, externalDocs } = operation;
     const hasDescription = !!(description || externalDocs);
-    const active = interactiveStore.active.get();
+    const active = interactiveStore.active?.operationId === operation.operationId;
 
     return (
       <OptionsContext.Consumer>
@@ -59,8 +59,14 @@ export class Operation extends React.Component<OperationProps> {
               </H2>
               {options.enableConsole && (
                 <SwitchBox
-                  onClick={interactiveStore.toggleActive}
-                  checked={interactiveStore.active.get()}
+                  onClick={() => {
+                    if (active) {
+                      interactiveStore.clearActive();
+                    } else {
+                      interactiveStore.setActive(operation);
+                    }
+                  }}
+                  checked={active}
                   label="Try it out!"
                 />
               )}
@@ -73,7 +79,11 @@ export class Operation extends React.Component<OperationProps> {
               )}
               <Extensions extensions={operation.extensions} />
               <SecurityRequirements securities={operation.security} />
-              <Parameters parameters={operation.parameters} body={operation.requestBody} />
+              <Parameters
+                operationId={operation.operationId}
+                parameters={operation.parameters}
+                body={operation.requestBody}
+              />
               <ResponsesList responses={operation.responses} />
               <CallbacksList callbacks={operation.callbacks} />
             </MiddlePanel>

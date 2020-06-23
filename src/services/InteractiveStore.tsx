@@ -1,16 +1,24 @@
 import { observable, action } from 'mobx';
+import { OperationModel } from '.';
 
 class InteractiveStore {
-  /** Whether or not the user is trying out the API */
-  active = observable.box(false);
+  /**
+   * If the user is trying out the API, this is set to the operation
+   */
+  @observable
+  active?: OperationModel;
 
   @action
-  toggleActive = () => {
-    const active = this.active.get();
-    if (active) {
-      this.currentParameters = {};
-    }
-    this.active.set(!active);
+  clearActive = () => {
+    this.currentParameters = {};
+    this.active = undefined;
+  };
+
+  @action
+  setActive = (operation: OperationModel) => {
+    this.clearActive();
+
+    this.active = operation;
   };
 
   /**
@@ -22,6 +30,7 @@ class InteractiveStore {
   @action
   addParameter = (parameter: string, value: string) => {
     this.currentParameters[parameter] = value;
+    console.warn('added parameters:', this.currentParameters);
   };
 }
 export const interactiveStore = new InteractiveStore();
