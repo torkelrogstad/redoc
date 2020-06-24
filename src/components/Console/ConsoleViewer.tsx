@@ -49,18 +49,18 @@ export const ConsoleViewer: React.FC<ConsoleViewerProps> = observer(
     const consoleEditor = React.useRef<AceEditor>(null);
 
     const invoke = async (body: string | undefined, headers: Headers) => {
+      for (const [key, value] of Object.entries(headers)) {
+        headers.append(key, `${value}`);
+      }
+
+      const request = new Request(url.toString(), {
+        method: operation.httpVerb,
+        redirect: 'manual',
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+      });
+
       try {
-        for (const [key, value] of Object.entries(headers)) {
-          headers.append(key, `${value}`);
-        }
-
-        const request = new Request(url.toString(), {
-          method: operation.httpVerb,
-          redirect: 'manual',
-          headers,
-          body: body ? JSON.stringify(body) : undefined,
-        });
-
         const response = await fetch(request);
         const content = await response.json();
         setResult({
@@ -68,6 +68,11 @@ export const ConsoleViewer: React.FC<ConsoleViewerProps> = observer(
           content,
         });
       } catch (error) {
+        console.error(
+          `got error when invoking ${request.method.toUpperCase()} ${request.url}:`,
+          error,
+        );
+
         setResult({ content: error });
       }
     };

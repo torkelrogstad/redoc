@@ -14,6 +14,10 @@ export const ConsoleResponse: React.FC<ConsoleResponseProps> = ({ response, cont
   const { type = 'error', status = 500, statusText, headers } = response ?? {};
   const [collapse, setCollapse] = React.useState(false);
 
+  let jsonContent = content;
+  if (content instanceof Error) {
+    jsonContent = content.message;
+  }
   return (
     <>
       <RightPanelHeader> status: </RightPanelHeader>
@@ -23,12 +27,12 @@ export const ConsoleResponse: React.FC<ConsoleResponseProps> = ({ response, cont
       </StatusWrapper>
       <RightPanelHeader> Response Payload </RightPanelHeader>
       <JsonWrapper>
-        <JsonViewer data={content} />
+        <JsonViewer data={jsonContent} />
       </JsonWrapper>
       <RightPanelHeader> Response Headers</RightPanelHeader>
       <HeaderWrapper>
         <SourceCodeWrapper className={'collapse-' + collapse}>
-          <SourceCodeWithCopy lang="json" source={JSON.stringify(headers, null, 2)} />
+          <SourceCodeWithCopy lang="json" source={JSON.stringify(headers ?? '', null, 2)} />
         </SourceCodeWrapper>
         {collapse && (
           <ShowMore onClick={() => setCollapse(!collapse)}>
