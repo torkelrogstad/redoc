@@ -221,6 +221,8 @@ ReDoc makes use of the following [vendor extensions](https://swagger.io/specific
 ### `<redoc>` options object
 You can use all of the following options with standalone version on <redoc> tag by kebab-casing them, e.g. `scrollYOffset` becomes `scroll-y-offset` and `expandResponses` becomes `expand-responses`.
 
+* `enableConsole` - enable interactive API console
+* `additionalServer` - prepend the given URL to the list of servers
 * `disableSearch` - disable search indexing and search box.
 * `expandDefaultServerVariables` - enable expanding default server variables, default `false`.
 * `expandResponses` - specify which responses to expand by default by response codes. Values should be passed as comma-separated list without spaces e.g. `expandResponses="200,201"`. Special value `"all"` expands all responses by default. Be careful: this option can slow-down documentation rendering time.

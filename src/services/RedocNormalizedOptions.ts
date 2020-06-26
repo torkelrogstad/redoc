@@ -11,6 +11,7 @@ export interface RedocRawOptions {
   hideHostname?: boolean | string;
   enableConsole?: boolean;
   additionalHeaders?: object;
+  additionalServer?: string;
   expandResponses?: string | 'all';
   requiredPropsFirst?: boolean | string;
   sortPropsAlphabetically?: boolean | string;
@@ -188,6 +189,7 @@ export class RedocNormalizedOptions {
   expandSingleSchemaField: boolean;
   enableConsole: boolean;
   additionalHeaders: object;
+  additionalServer: string | undefined;
 
   /* tslint:disable-next-line */
   unstable_ignoreMimeParameters: boolean;
@@ -246,6 +248,7 @@ export class RedocNormalizedOptions {
     this.expandSingleSchemaField = argValueToBoolean(raw.expandSingleSchemaField);
     this.enableConsole = argValueToBoolean(raw.enableConsole);
     this.additionalHeaders = raw.additionalHeaders || {};
+    this.additionalServer = raw.additionalServer;
 
     this.unstable_ignoreMimeParameters = argValueToBoolean(raw.unstable_ignoreMimeParameters);
 

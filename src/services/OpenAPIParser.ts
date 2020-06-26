@@ -88,6 +88,16 @@ export class OpenAPIParser {
         const comment = buildComponentComment(SECURITY_DEFINITIONS_COMPONENT_NAME);
         spec.info.description = appendToMdHeading(description, 'Authentication', comment);
       }
+
+      // insert extra server, if provided
+      if (this.options.additionalServer) {
+        spec.servers = [
+          {
+            url: this.options.additionalServer,
+          },
+          ...(spec.servers ?? []),
+        ];
+      }
     }
   }
 
