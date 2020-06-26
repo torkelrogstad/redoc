@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { SourceCodeWithCopy } from '..';
 import { RightPanelHeader } from '../../common-elements';
 import styled from '../../styled-components';
 
@@ -10,9 +9,36 @@ interface ConsoleResponseProps {
   content: any;
 }
 
+const Italic = styled.span`
+  font-style: italic;
+  padding: 1em;
+`;
+
+const LightItalic = styled.span`
+  font-style: italic;
+  font-size: 70%;
+  font-weight: lighter;
+  margin-left: 1em;
+`;
+
+const Pre = styled.pre`
+  padding: 1em;
+`;
+
 export const ConsoleResponse: React.FC<ConsoleResponseProps> = ({ response, content }) => {
   const { type = 'error', status = 500, statusText, headers } = response ?? {};
   const [collapse, setCollapse] = React.useState(false);
+
+  const renderAbleHeaders =
+    headers !== undefined ? (
+      <Pre>
+        {Array.from(headers.entries())
+          .map(([key, value]) => `${key}: ${value}`)
+          .join('\n')}
+      </Pre>
+    ) : (
+      <Italic>no headers found</Italic>
+    );
 
   let jsonContent = content;
   if (content instanceof Error) {
@@ -29,10 +55,13 @@ export const ConsoleResponse: React.FC<ConsoleResponseProps> = ({ response, cont
       <JsonWrapper>
         <JsonViewer data={jsonContent} />
       </JsonWrapper>
-      <RightPanelHeader> Response Headers</RightPanelHeader>
+      <RightPanelHeader>
+        Response Headers
+        <LightItalic>(Only the ones CORS let us read)</LightItalic>
+      </RightPanelHeader>
       <HeaderWrapper>
         <SourceCodeWrapper className={'collapse-' + collapse}>
-          <SourceCodeWithCopy lang="json" source={JSON.stringify(headers ?? '', null, 2)} />
+          {renderAbleHeaders}
         </SourceCodeWrapper>
         {collapse && (
           <ShowMore onClick={() => setCollapse(!collapse)}>
