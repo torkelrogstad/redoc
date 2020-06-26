@@ -85,13 +85,16 @@ export const ConsoleViewer: React.FC<ConsoleViewerProps> = observer(
       const contentType =
         mediaTypes[requestBodyContent?.activeMimeIdx ?? 0]?.name ?? 'application/json';
 
-      const headers: Array<string[]> = [
+      const apiKeyHeaders: Array<[string, string]> = securitySchemes.schemes
+        .filter(scheme => scheme.apiKey?.in === 'header' && scheme.token)
+        .map(scheme => [scheme.apiKey!.name, scheme.token!]);
+
+      const headers: Array<[string, string]> = [
         ['Content-Type', contentType],
-        ...securitySchemes.schemes
-          .map(scheme => [scheme.id, scheme.token ?? ''])
-          .filter(([, value]) => value !== ''),
+        ...apiKeyHeaders,
         ...Object.entries(additionalHeaders),
       ];
+
       return invoke(value, new Headers(headers));
     };
 
