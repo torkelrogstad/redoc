@@ -30,7 +30,7 @@ export const ConsoleEditor = observer(
         }
 
         if ('default' in media.examples) {
-          return media.examples.default;
+          return media.examples.default.value;
         }
         return media.examples[keys[0]];
       })

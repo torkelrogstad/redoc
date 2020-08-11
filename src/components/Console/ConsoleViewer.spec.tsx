@@ -1,54 +1,24 @@
 import * as rtl from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import * as path from 'path';
-import * as yaml from 'yaml-js';
 import { ConsoleViewer } from './ConsoleViewer';
-import {
-  SpecStore,
-  RedocNormalizedOptions,
-  OperationModel,
-  ContentItemModel,
-} from '../../services';
-import { readFileSync } from 'fs';
+import { RedocNormalizedOptions } from '../../services';
 import { ThemeProvider } from 'styled-components';
 import { waitFor } from '@testing-library/react';
 import fetchMock from 'jest-fetch-mock';
-// eslint-disable-next-line import/no-internal-modules
-import { IAceEditor } from 'react-ace/lib/types';
 import { act } from 'react-dom/test-utils';
-
-const getAllOperations = (items: ContentItemModel[]): ContentItemModel[] => {
-  if (items.length === 0) {
-    return [];
-  }
-
-  return items
-    .concat(...items.map((item) => getAllOperations(item.items)))
-    .filter((item) => item instanceof OperationModel);
-};
-
-const findOperation = (id: string, spec: SpecStore): OperationModel => {
-  const operations = getAllOperations(spec.contentItems);
-  const op = operations.find((item) => item.id === `operation/${id}`);
-  if (!op) {
-    fail(`could not find operation with ID ${id}`);
-  }
-  expect(op).toBeInstanceOf(OperationModel);
-  return op as OperationModel;
-};
+import { findOperation, getSpec, getAceEditor } from './ConsoleTestUtil';
 
 const setup = (operationId: string) => {
   const options = new RedocNormalizedOptions({});
-  const spec = readFileSync(path.join(__filename, '..', '..', '..', '..', 'demo', 'openapi.yaml'));
-  const specStore = new SpecStore(yaml.load(spec), undefined, options);
+  const spec = getSpec('openapi.yaml');
 
   return rtl.render(
     <ThemeProvider theme={options.theme}>
       <ConsoleViewer
-        securitySchemes={specStore.securitySchemes}
+        securitySchemes={spec.securitySchemes}
         urlIndex={0}
-        operation={findOperation(operationId, specStore)}
+        operation={findOperation(operationId, spec)}
       />
     </ThemeProvider>,
   );
@@ -97,16 +67,3 @@ test('prevents sending if body is missing path parameters', async () => {
   expect(utils.getByText('Missing path parameters: petId')).toBeInTheDocument();
   expect(utils.getByText('Send Request')).toBeDisabled();
 });
-
-const getAceEditor = (utils: rtl.RenderResult): IAceEditor => {
-  const textarea = utils.getByRole('textbox');
-  const fiberKey = Object.keys(textarea.parentElement!).find((key) =>
-    key.startsWith('__reactInternalInstance$'),
-  );
-  const fiber = textarea.parentElement![fiberKey!];
-  expect(fiber).not.toBeNull();
-
-  const editor = fiber.stateNode.env.editor as IAceEditor;
-  expect(editor).toBeDefined();
-  return editor;
-};
