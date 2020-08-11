@@ -5,6 +5,7 @@ import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-json';
 // eslint-disable-next-line import/no-internal-modules
 import 'ace-builds/src-noconflict/ext-language_tools';
+// eslint-disable-next-line import/no-internal-modules
 import 'ace-builds/src-noconflict/theme-monokai';
 
 import { MediaTypeModel } from '../../services/models';
