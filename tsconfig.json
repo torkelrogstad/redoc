@@ -25,7 +25,8 @@
     "types": [
       "webpack",
       "webpack-env",
-      "jest"
+      "jest",
+      "@testing-library/jest-dom"
     ]
   },
   "compileOnSave": false,

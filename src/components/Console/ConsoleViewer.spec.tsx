@@ -4,39 +4,57 @@ import * as React from 'react';
 import * as path from 'path';
 import * as yaml from 'yaml-js';
 import { ConsoleViewer } from './ConsoleViewer';
-import { SpecStore, RedocNormalizedOptions, OperationModel } from '../../services';
+import {
+  SpecStore,
+  RedocNormalizedOptions,
+  OperationModel,
+  ContentItemModel,
+} from '../../services';
 import { readFileSync } from 'fs';
 import { ThemeProvider } from 'styled-components';
 import { waitFor } from '@testing-library/react';
 import fetchMock from 'jest-fetch-mock';
+// eslint-disable-next-line import/no-internal-modules
 import { IAceEditor } from 'react-ace/lib/types';
 import { act } from 'react-dom/test-utils';
 
-test('sending does not reset body', async () => {
+const getAllOperations = (items: ContentItemModel[]): ContentItemModel[] => {
+  if (items.length === 0) {
+    return [];
+  }
+
+  return items
+    .concat(...items.map((item) => getAllOperations(item.items)))
+    .filter((item) => item instanceof OperationModel);
+};
+
+const findOperation = (id: string, spec: SpecStore): OperationModel => {
+  const operations = getAllOperations(spec.contentItems);
+  const op = operations.find((item) => item.id === `operation/${id}`);
+  if (!op) {
+    fail(`could not find operation with ID ${id}`);
+  }
+  expect(op).toBeInstanceOf(OperationModel);
+  return op as OperationModel;
+};
+
+const setup = (operationId: string) => {
   const options = new RedocNormalizedOptions({});
   const spec = readFileSync(path.join(__filename, '..', '..', '..', '..', 'demo', 'openapi.yaml'));
   const specStore = new SpecStore(yaml.load(spec), undefined, options);
 
-  const general = specStore.contentItems.find((item) => item.name === 'General');
-  expect(general).toBeDefined();
-
-  const pet = general?.items.find((item) => item.description === 'Everything about your Pets');
-  expect(pet).toBeDefined();
-
-  const newPet = pet?.items.find(
-    (item) => item.description === 'Add new pet to the store inventory.',
-  );
-  expect(newPet).toBeDefined();
-
-  const utils = rtl.render(
+  return rtl.render(
     <ThemeProvider theme={options.theme}>
       <ConsoleViewer
         securitySchemes={specStore.securitySchemes}
         urlIndex={0}
-        operation={newPet as OperationModel}
+        operation={findOperation(operationId, specStore)}
       />
     </ThemeProvider>,
   );
+};
+test('sending does not reset body', async () => {
+  const utils = setup('addPet');
 
   const editor = getAceEditor(utils);
   const aceBody = { foo: 2 };
@@ -54,12 +72,30 @@ test('sending does not reset body', async () => {
   };
 
   const button = utils.getByRole('button');
+  expect(button).not.toBeDisabled();
   userEvent.click(button);
   await assertFetchArgs();
 
   fetchMock.resetMocks();
   userEvent.click(button);
   await assertFetchArgs();
+});
+
+test('prevents sending if body is invalid json', async () => {
+  const utils = setup('addPet');
+  const editor = getAceEditor(utils);
+  act(() => {
+    editor.setValue('invalid JSON');
+  });
+
+  expect(utils.getByText('Body is invalid JSON')).toBeInTheDocument();
+  expect(utils.getByText('Send Request')).toBeDisabled();
+});
+
+test('prevents sending if body is missing path parameters', async () => {
+  const utils = setup('updatePetWithForm');
+  expect(utils.getByText('Missing path parameters: petId')).toBeInTheDocument();
+  expect(utils.getByText('Send Request')).toBeDisabled();
 });
 
 const getAceEditor = (utils: rtl.RenderResult): IAceEditor => {

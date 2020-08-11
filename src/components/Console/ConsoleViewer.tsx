@@ -101,16 +101,36 @@ export const ConsoleViewer: React.FC<ConsoleViewerProps> = observer(
       return invoke(value, new Headers(headers));
     };
 
+    const [invalidJsonInput, setInvalidJsonInput] = React.useState(false);
+    React.useEffect(() => {
+      consoleEditor.current?.editor.addEventListener('change', () => {
+        try {
+          const editorValue = consoleEditor.current?.editor.getValue() ?? '';
+          if (editorValue) {
+            JSON.parse(editorValue);
+          }
+        } catch (e) {
+          setInvalidJsonInput(true);
+        }
+      });
+    }, [consoleEditor]);
+
+    const hasMissingParams = missingParameters.length !== 0;
+    let toolTip = '';
+    if (hasMissingParams) {
+      toolTip = `Missing path parameters: ${missingParameters.join(', ')}`;
+    }
+    if (invalidJsonInput) {
+      toolTip = 'Body is invalid JSON';
+    }
+
     return (
       <div>
         <h3> Request </h3>
         {hasBodySample && <ConsoleEditor mediaTypes={mediaTypes} ref={consoleEditor} />}
         <FlexLayoutReverse>
-          <Tooltip
-            title={`Missing path parameters: ${missingParameters.join(', ')}`}
-            open={missingParameters.length !== 0}
-          >
-            <SubmitButton disabled={missingParameters.length !== 0} onClick={onClickSend}>
+          <Tooltip title={toolTip} open={hasMissingParams || invalidJsonInput}>
+            <SubmitButton disabled={hasMissingParams || invalidJsonInput} onClick={onClickSend}>
               Send Request
             </SubmitButton>
           </Tooltip>

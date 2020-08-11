@@ -80,7 +80,6 @@
     "@types/react-tabs": "^2.3.2",
     "@types/styled-components": "^5.1.1",
     "@types/tapable": "^1.0.6",
-    "@types/testing-library__jest-dom": "^5.9.2",
     "@types/webpack": "^4.41.21",
     "@types/webpack-env": "^1.15.2",
     "@types/yargs": "^15.0.5",
