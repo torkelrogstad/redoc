@@ -82,6 +82,7 @@ export default (env: { standalone?: boolean } = {}, { mode }) => ({
           {
             loader: 'ts-loader',
             options: {
+              transpileOnly: true,
               compilerOptions: {
                 module: 'es2015',
                 declaration: false,

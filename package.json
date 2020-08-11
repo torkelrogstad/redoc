@@ -35,7 +35,7 @@
     "bundlesize": "bundlesize",
     "cy:open": "cypress open",
     "bundle:clean": "rimraf bundles",
-    "bundle:standalone": "webpack --env.standalone --mode=production",
+    "bundle:standalone": "tsc --skipLibCheck --noEmit && webpack --env.standalone --mode=production",
     "bundle:lib": "webpack --mode=production && npm run declarations",
     "bundle": "npm run bundle:clean && npm run bundle:lib && npm run bundle:standalone",
     "declarations": "tsc --emitDeclarationOnly -p tsconfig.lib.json && cp -R src/types typings/",
@@ -49,7 +49,8 @@
     "build:demo": "webpack --mode=production --config demo/webpack.config.ts",
     "deploy:demo": "npm run build:demo && deploy-to-gh-pages --update demo/dist",
     "license-check": "license-checker --production --onlyAllow 'MIT;ISC;Apache-2.0;BSD;BSD-2-Clause;BSD-3-Clause' --summary",
-    "docker:build": "docker build -f config/docker/Dockerfile -t rogstad/redoc ."
+    "docker:build": "docker build -f config/docker/Dockerfile -t rogstad/redoc:$(git rev-parse --short HEAD) .",
+    "docker:push": "docker push rogstad/redoc:$(git rev-parse --short HEAD)"
   },
   "devDependencies": {
     "@babel/core": "^7.10.5",
