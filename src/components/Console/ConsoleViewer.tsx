@@ -12,18 +12,16 @@ import { observer } from 'mobx-react';
 export interface ConsoleViewerProps {
   operation: OperationModel;
   additionalHeaders?: object;
-  queryParamPrefix?: string;
-  queryParamSuffix?: string;
   securitySchemes: SecuritySchemesModel;
   urlIndex: number;
 }
 
 const SubmitButton = styled.button`
-  background: ${props => props.theme.colors.primary.main};
+  background: ${(props) => props.theme.colors.primary.main};
   padding: 10px 30px;
   border-radius: 4px;
-  color: ${props => props.theme.colors.text.secondary};
-  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
+  color: ${(props) => props.theme.colors.text.secondary};
+  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
   text-align: center;
   outline: none;
   margin: 1em 0;
@@ -60,18 +58,23 @@ export const ConsoleViewer: React.FC<ConsoleViewerProps> = observer(
         body: body ? JSON.stringify(body) : undefined,
       });
 
+      let rawResponseBody = '';
       try {
         const response = await fetch(request);
-        const content = await response.json();
+        rawResponseBody = await response.clone().text();
         setResult({
           response,
-          content,
+          content: JSON.stringify(rawResponseBody),
         });
       } catch (error) {
-        console.error(
-          `got error when invoking ${request.method.toUpperCase()} ${request.url}:`,
-          error,
-        );
+        let msg = `got error when invoking ${request.method.toUpperCase()} ${request.url}`;
+        if (body) {
+          msg = `${msg}, body: ${JSON.stringify(body)}`;
+        }
+        if (rawResponseBody) {
+          msg = `${msg}, response: ${rawResponseBody}`;
+        }
+        console.error(msg + ':', error);
 
         setResult({ content: error });
       }
@@ -86,8 +89,8 @@ export const ConsoleViewer: React.FC<ConsoleViewerProps> = observer(
         mediaTypes[requestBodyContent?.activeMimeIdx ?? 0]?.name ?? 'application/json';
 
       const apiKeyHeaders: Array<[string, string]> = securitySchemes.schemes
-        .filter(scheme => scheme.apiKey?.in === 'header' && scheme.token)
-        .map(scheme => [scheme.apiKey!.name, scheme.token!]);
+        .filter((scheme) => scheme.apiKey?.in === 'header' && scheme.token)
+        .map((scheme) => [scheme.apiKey!.name, scheme.token!]);
 
       const headers: Array<[string, string]> = [
         ['Content-Type', contentType],

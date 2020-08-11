@@ -20,8 +20,8 @@ export const ConsoleEditor = observer(
       return null;
     }
     const sample = mediaTypes
-      .filter(media => media.name.includes('json'))
-      .map(media => {
+      .filter((media) => media.name.includes('json'))
+      .map((media) => {
         const keys = Object.keys(media.examples ?? {});
         if (media.examples === undefined || keys.length === 0) {
           return undefined;
@@ -32,8 +32,9 @@ export const ConsoleEditor = observer(
         }
         return media.examples[keys[0]];
       })
-      .find(media => media !== undefined);
+      .find((media) => media !== undefined);
 
+    const [state, setState] = React.useState(JSON.stringify(sample, null, 2));
     return (
       <ConsoleEditorWrapper>
         <AceEditor
@@ -53,7 +54,8 @@ export const ConsoleEditor = observer(
           mode="json"
           name="request-builder-editor"
           editorProps={{ $blockScrolling: true }}
-          value={JSON.stringify(sample, null, 2)}
+          value={state}
+          onChange={(value) => setState(value)}
           ref={ref}
         />
       </ConsoleEditorWrapper>
