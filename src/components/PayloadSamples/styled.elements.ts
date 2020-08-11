@@ -1,6 +1,6 @@
 import { transparentize } from 'polished';
 import styled from '../../styled-components';
-import { StyledDropdown } from '../../common-elements';
+import { StyledDropdown } from '../../common-elements/dropdown';
 
 export const MimeLabel = styled.div`
   padding: 0.9em;
@@ -71,7 +71,7 @@ export const InvertedSimpleDropdown = styled(StyledDropdown)`
 `;
 
 export const NoSampleLabel = styled.div`
-  font-family: ${props => props.theme.typography.code.fontFamily};
+  font-family: ${(props) => props.theme.typography.code.fontFamily};
   font-size: 12px;
   color: #ee807f;
 `;
