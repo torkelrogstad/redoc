@@ -5,6 +5,7 @@ import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-json';
 // eslint-disable-next-line import/no-internal-modules
 import 'ace-builds/src-noconflict/ext-language_tools';
+import 'ace-builds/src-noconflict/theme-monokai';
 
 import { MediaTypeModel } from '../../services/models';
 import { ConsoleEditorWrapper } from './ConsoleEditorWrapper';
@@ -54,6 +55,7 @@ export const ConsoleEditor = observer(
           mode="json"
           name="request-builder-editor"
           editorProps={{ $blockScrolling: true }}
+          theme="monokai"
           value={state}
           onChange={(value) => setState(value)}
           ref={ref}
