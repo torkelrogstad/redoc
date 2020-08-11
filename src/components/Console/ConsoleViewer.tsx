@@ -64,7 +64,7 @@ export const ConsoleViewer: React.FC<ConsoleViewerProps> = observer(
         rawResponseBody = await response.clone().text();
         setResult({
           response,
-          content: JSON.stringify(rawResponseBody),
+          content: JSON.parse(rawResponseBody),
         });
       } catch (error) {
         let msg = `got error when invoking ${request.method.toUpperCase()} ${request.url}`;
